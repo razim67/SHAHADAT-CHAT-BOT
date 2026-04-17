@@ -8,7 +8,7 @@ module.exports.config = {
   name: "autoreplybot",
   version: "2.0.0",
   hasPermssion: 0,
-  credits: "SHAHADAT SAHU",
+  credits: "RAZIM vai",
   usePrefix: false,
   commandCategory: "Chat",
   cooldowns: 0
@@ -33,7 +33,7 @@ module.exports.handleEvent = async function ({ api, event }) {
     "tor ball": "~ এখনো বাল উঠে নাই নাকি তোমার?? 🤖",
     "shahadat": "উনি এখন কাজে বিজি আছে কি বলবেন আমাকে বলতে পারেন..!😘",
     "owner": "‎[𝐎𝐖𝐍𝐄𝐑:☞ SHAHADAT SAHU ☜\nFacebook: https://www.facebook.com/profile.php?id=100044713412032\nWhatsApp: +8801882333052",
-    "admin": "He is SHAHADAT SAHU তাকে সবাই Admin SAHU হিসেবে চিনে😘☺️",
+    "admin": "He is Maruf Hasan Razim  তাকে সবাই Maruf নামে চিনে😘☺️",
     "babi": "এ তো হাছিনা হে মেরে দিলকি দারকান হে মেরি জান হে😍.",
     "chup": "তুই চুপ চুপ কর পাগল ছাগল",
     "Assalamualaikum": "Walaikumassalam❤️‍🩹",
