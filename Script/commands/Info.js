@@ -4,7 +4,7 @@ const moment = require("moment-timezone");
 
 module.exports.config = {
   name: "info",
-  version: "1.0.1",
+  version: "1.0.2",
   hasPermssion: 0,
   credits: "RAZIM",
   description: "Bot information command",
@@ -14,7 +14,7 @@ module.exports.config = {
   cooldowns: 5,
 };
 
-module.exports.run = async function ({ api, event, args, Users, Threads }) {
+module.exports.run = async function ({ api, event, Threads }) {
 
   const { threadID } = event;
 
@@ -24,15 +24,15 @@ module.exports.run = async function ({ api, event, args, Users, Threads }) {
 
   const { commands } = global.client;
   const threadSetting = (await Threads.getData(String(threadID))).data || {};
-  const prefix = threadSetting.hasOwnProperty("PREFIX") ? threadSetting.PREFIX : config.PREFIX;
+  const prefix = threadSetting.PREFIX || config.PREFIX;
 
   const uptime = process.uptime();
   const hours = Math.floor(uptime / 3600);
   const minutes = Math.floor((uptime % 3600) / 60);
   const seconds = Math.floor(uptime % 60);
 
-  const totalUsers = global.data.allUserID.length;
-  const totalThreads = global.data.allThreadID.length;
+  const totalUsers = global.data.allUserID.length || 0;
+  const totalThreads = global.data.allThreadID.length || 0;
 
   const msg = `╭⭓ ⪩ 𝐁𝐎𝐓 𝐈𝐍𝐅𝐎 ⪨
 │
@@ -52,7 +52,7 @@ module.exports.run = async function ({ api, event, args, Users, Threads }) {
 ├─ 💬 𝗠𝗲𝘀𝘀𝗲𝗻𝗴𝗲𝗿 :
 │ m.me/razim678
 ├─ 📞 𝗪𝗵𝗮𝘁𝘀𝗔𝗽𝗽 :
-│ wa.me/+8801620093517
+│ wa.me/8801620093517
 │
 ╰───────⭓
 
@@ -66,14 +66,21 @@ module.exports.run = async function ({ api, event, args, Users, Threads }) {
 ❤️ 𝗧𝗵𝗮𝗻𝗸𝘀 𝗳𝗼𝗿 𝘂𝘀𝗶𝗻𝗴 🌺
 😍 𝐑𝐀𝐙𝐈𝐌 𝐂𝐇𝐀𝐓 𝐁𝐎𝐓 😘`;
 
+  const path = __dirname + "/cache/info.jpg";
+
   const callback = () => {
     api.sendMessage({
       body: msg,
-      attachment: fs.createReadStream(__dirname + "/cache/info.jpg")
-    }, threadID, () => fs.unlinkSync(__dirname + "/cache/info.jpg"));
+      attachment: fs.createReadStream(path)
+    }, threadID, () => {
+      try { fs.unlinkSync(path); } catch (e) {}
+    });
   };
 
   return request("https://i.ibb.co/BH3V8VXq/1776127786190.png")
-    .pipe(fs.createWriteStream(__dirname + "/cache/info.jpg"))
-    .on("close", callback);
+    .pipe(fs.createWriteStream(path))
+    .on("close", callback)
+    .on("error", () => {
+      api.sendMessage(msg, threadID);
+    });
 };
