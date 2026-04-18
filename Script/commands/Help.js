@@ -4,9 +4,9 @@ const path = require("path");
 
 module.exports.config = {
     name: "help",
-    version: "2.0.0",
+    version: "2.0.1",
     hasPermssion: 0,
-    credits: "SHAHADAT SAHU",
+    credits: "RAZIM",
     description: "Shows all commands with details",
     commandCategory: "system",
     usages: "[command name/page number]",
@@ -32,7 +32,7 @@ module.exports.languages = {
 ┣━━━━━━━━━━━━━━━━┫
 ┃ ⚙ Prefix: %8
 ┃ 🤖 Bot Name: %9
-┃ 👑 Owner: 𝐒𝐇𝐀𝐇𝐀𝐃𝐀𝐓 𝐒𝐀𝐇𝐔
+┃ 👑 Owner: 𝐌𝐀𝐑𝐔𝐅 𝐇𝐀𝐒𝐀𝐍 𝐑𝐀𝐙𝐈𝐌
 ╰━━━━━━━━━━━━━━━━╯`,
         "helpList": "[ There are %1 commands. Use: \"%2help commandName\" to view more. ]",
         "user": "User",
@@ -41,98 +41,96 @@ module.exports.languages = {
     }
 };
 
-// 🔹 এখানে আপনার ফটো Imgur লিংক করে বসাবেন ✅
-const helpImages = [
-    "https://i.imgur.com/sxSn1K3.jpeg",
-    "https://i.imgur.com/8WvpgUL.jpeg",
-    "https://i.imgur.com/8WvpgUL.jpeg",
-    "https://i.imgur.com/sxSn1K3.jpeg"
-];
+const helpImage = "https://i.ibb.co/BH3V8VXq/1776127786190.png";
 
+function downloadImage(callback) {
+    const filePath = path.join(__dirname, "cache", "help.jpg");
 
-function downloadImages(callback) {
-    const randomUrl = helpImages[Math.floor(Math.random() * helpImages.length)];
-    const filePath = path.join(__dirname, "cache", "help_random.jpg");
-
-    request(randomUrl)
+    request(helpImage)
         .pipe(fs.createWriteStream(filePath))
-        .on("close", () => callback([filePath]));
+        .on("close", () => callback([filePath]))
+        .on("error", () => callback([]));
 }
 
 module.exports.handleEvent = function ({ api, event, getText }) {
     const { commands } = global.client;
     const { threadID, messageID, body } = event;
 
-    if (!body || typeof body === "undefined" || body.indexOf("help") != 0) return;  
-    const splitBody = body.slice(body.indexOf("help")).trim().split(/\s+/);  
-    if (splitBody.length < 2 || !commands.has(splitBody[1].toLowerCase())) return;  
+    if (!body || body.indexOf("help") != 0) return;
 
-    const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};  
-    const command = commands.get(splitBody[1].toLowerCase());  
-    const prefix = threadSetting.PREFIX || global.config.PREFIX;  
+    const splitBody = body.trim().split(/\s+/);
+    if (splitBody.length < 2 || !commands.has(splitBody[1].toLowerCase())) return;
 
-    const detail = getText("moduleInfo",  
-        command.config.name,  
-        command.config.usages || "Not Provided",  
-        command.config.description || "Not Provided",  
-        command.config.hasPermssion,  
-        command.config.credits || "Unknown",  
-        command.config.commandCategory || "Unknown",  
-        command.config.cooldowns || 0,  
-        prefix,  
-        global.config.BOTNAME || "𝐒𝐡𝐚𝐡𝐚𝐝𝐚𝐭 𝐂𝐡𝐚𝐭 𝐁𝐨𝐭"  
-    );  
+    const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
+    const command = commands.get(splitBody[1].toLowerCase());
+    const prefix = threadSetting.PREFIX || global.config.PREFIX;
 
-    downloadImages(files => {  
-        const attachments = files.map(f => fs.createReadStream(f));  
-        api.sendMessage({ body: detail, attachment: attachments }, threadID, () => {  
-            files.forEach(f => fs.unlinkSync(f));  
-        }, messageID);  
+    const detail = getText("moduleInfo",
+        command.config.name,
+        command.config.usages || "Not Provided",
+        command.config.description || "Not Provided",
+        command.config.hasPermssion,
+        command.config.credits || "Unknown",
+        command.config.commandCategory || "Unknown",
+        command.config.cooldowns || 0,
+        prefix,
+        global.config.BOTNAME || "RAZIM CHAT BOT"
+    );
+
+    downloadImage(files => {
+        const attachments = files.map(f => fs.createReadStream(f));
+        api.sendMessage({ body: detail, attachment: attachments }, threadID, () => {
+            files.forEach(f => fs.unlinkSync(f));
+        }, messageID);
     });
 };
 
 module.exports.run = function ({ api, event, args, getText }) {
+
     const { commands } = global.client;
     const { threadID, messageID } = event;
 
-    const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};  
-    const prefix = threadSetting.PREFIX || global.config.PREFIX;  
+    const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
+    const prefix = threadSetting.PREFIX || global.config.PREFIX;
 
-    if (args[0] && commands.has(args[0].toLowerCase())) {  
-        const command = commands.get(args[0].toLowerCase());  
+    if (args[0] && commands.has(args[0].toLowerCase())) {
 
-        const detailText = getText("moduleInfo",  
-            command.config.name,  
-            command.config.usages || "Not Provided",  
-            command.config.description || "Not Provided",  
-            command.config.hasPermssion,  
-            command.config.credits || "Unknown",  
-            command.config.commandCategory || "Unknown",  
-            command.config.cooldowns || 0,  
-            prefix,  
-            global.config.BOTNAME || "𝐒𝐡𝐚𝐡𝐚𝐝𝐚𝐭 𝐂𝐡𝐚𝐭 𝐁𝐨𝐭"  
-        );  
+        const command = commands.get(args[0].toLowerCase());
 
-        downloadImages(files => {  
-            const attachments = files.map(f => fs.createReadStream(f));  
-            api.sendMessage({ body: detailText, attachment: attachments }, threadID, () => {  
-                files.forEach(f => fs.unlinkSync(f));  
-            }, messageID);  
-        });  
-        return;  
-    }  
+        const detailText = getText("moduleInfo",
+            command.config.name,
+            command.config.usages || "Not Provided",
+            command.config.description || "Not Provided",
+            command.config.hasPermssion,
+            command.config.credits || "Unknown",
+            command.config.commandCategory || "Unknown",
+            command.config.cooldowns || 0,
+            prefix,
+            global.config.BOTNAME || "RAZIM CHAT BOT"
+        );
+
+        downloadImage(files => {
+            const attachments = files.map(f => fs.createReadStream(f));
+            api.sendMessage({ body: detailText, attachment: attachments }, threadID, () => {
+                files.forEach(f => fs.unlinkSync(f));
+            }, messageID);
+        });
+
+        return;
+    }
 
     const arrayInfo = Array.from(commands.keys())
-        .filter(cmdName => cmdName && cmdName.trim() !== "")
-        .sort();  
+        .filter(cmd => cmd && cmd.trim() !== "")
+        .sort();
 
-    const page = Math.max(parseInt(args[0]) || 1, 1);  
-    const numberOfOnePage = 20;  
-    const totalPages = Math.ceil(arrayInfo.length / numberOfOnePage);  
-    const start = numberOfOnePage * (page - 1);  
-    const helpView = arrayInfo.slice(start, start + numberOfOnePage);  
+    const page = Math.max(parseInt(args[0]) || 1, 1);
+    const limit = 20;
+    const totalPages = Math.ceil(arrayInfo.length / limit);
+    const start = limit * (page - 1);
 
-    let msg = helpView.map(cmdName => `┃ ✪ ${cmdName}`).join("\n");
+    const list = arrayInfo.slice(start, start + limit)
+        .map(cmd => `┃ ✪ ${cmd}`)
+        .join("\n");
 
     const text = `╭━━━━━━━━━━━━━━━━╮
 ┃ 📜 𝐂𝐎𝐌𝐌𝐀𝐍𝐃 𝐋𝐈𝐒𝐓 📜
@@ -140,17 +138,17 @@ module.exports.run = function ({ api, event, args, getText }) {
 ┃ 📄 Page: ${page}/${totalPages}
 ┃ 🧮 Total: ${arrayInfo.length}
 ┣━━━━━━━━━━━━━━━━┫
-${msg}
+${list}
 ┣━━━━━━━━━━━━━━━━┫
 ┃ ⚙ Prefix: ${prefix}
-┃ 🤖 Bot Name: ${global.config.BOTNAME || "𝐒𝐡𝐚𝐡𝐚𝐝𝐚𝐭 𝐂𝐡𝐚𝐭 𝐁𝐨𝐭"}
-┃ 👑 Owner: 𝐒𝐇𝐀𝐇𝐀𝐃𝐀𝐓 𝐒𝐀𝐇𝐔
+┃ 🤖 Bot Name: ${global.config.BOTNAME || "RAZIM CHAT BOT"}
+┃ 👑 Owner: 𝐌𝐀𝐑𝐔𝐅 𝐇𝐀𝐒𝐀𝐍 𝐑𝐀𝐙𝐈𝐌
 ╰━━━━━━━━━━━━━━━━╯`;
 
-    downloadImages(files => {  
-        const attachments = files.map(f => fs.createReadStream(f));  
-        api.sendMessage({ body: text, attachment: attachments }, threadID, () => {  
-            files.forEach(f => fs.unlinkSync(f));  
-        }, messageID);  
-    });  
+    downloadImage(files => {
+        const attachments = files.map(f => fs.createReadStream(f));
+        api.sendMessage({ body: text, attachment: attachments }, threadID, () => {
+            files.forEach(f => fs.unlinkSync(f));
+        }, messageID);
+    });
 };
