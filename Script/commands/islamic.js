@@ -1,25 +1,20 @@
 module.exports.config = {
  name: "islamick",
- version: "1.0.0",
+ version: "2.0.0",
  hasPermssion: 0,
- credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
- description: "RANDOM islamic video",
+ credits: "RAZIM",
+ description: "Random Islamic video (Animated)",
  commandCategory: "Random video",
- usages: "Statusvideo",
- cooldowns: 2,
- dependencies: {
- "request":"",
- "fs-extra":"",
- "axios":""
- }
- 
+ usages: "",
+ cooldowns: 3
 };
 
-module.exports.run = async({api,event,args,Users,Threads,Currencies}) => {
-const axios = global.nodemodule["axios"];
-const request = global.nodemodule["request"];
-const fs = global.nodemodule["fs-extra"];
- var link = [
+module.exports.run = async ({ api, event }) => {
+
+ const request = global.nodemodule["request"];
+ const fs = global.nodemodule["fs-extra"];
+
+ const videos = [
 "https://i.imgur.com/FbnZI40.mp4",
 "https://i.imgur.com/8k6OOZg.mp4",
 "https://i.imgur.com/lgQghHX.mp4",
@@ -29,32 +24,56 @@ const fs = global.nodemodule["fs-extra"];
 "https://i.imgur.com/OKKlDBN.mp4",
 "https://i.imgur.com/6wWebFc.mp4",
 "https://i.imgur.com/K2LTmaA.mp4",
-"https://i.imgur.com/i9vKvTd.mp4",
-"https://i.imgur.com/Y6uBzxx.mp4",
-"https://i.imgur.com/ULtFVPQ.mp4",
-"https://i.imgur.com/wX8WJh3.mp4",
-"https://i.imgur.com/6A42EIx.mp4",
-"https://i.imgur.com/ozRevxt.mp4",
-"https://i.imgur.com/Gd49ZSo.mp4",
-"https://i.imgur.com/xu6lBXk.mp4",
-"https://i.imgur.com/sDNohv4.mp4",
-"https://i.imgur.com/JBu2Ie3.mp4",
-"https://i.imgur.com/UaY42rq.mp4",
-"https://i.imgur.com/NFxf731.mp4",
-"https://i.imgur.com/vv1HsMC.mp4",
-"https://i.imgur.com/Y8MPzLv.mp4",
-"https://i.imgur.com/9M1v1qK.mp4",
-"https://i.imgur.com/EgUy7v0.mp4",
-"https://i.imgur.com/IjDqg2G.mp4",
-"https://i.imgur.com/51NYqmO.mp4",
-"https://i.imgur.com/XjfJHh9.mp4",
-"https://i.imgur.com/XHrkPt4.mp4",
-"https://i.imgur.com/mqEYRdy.mp4",
-"https://i.imgur.com/NaVsFmQ.mp4",
-"https://i.imgur.com/31XSmVj.mp4",
-"https://i.imgur.com/PPamCPI.mp4",
-"https://i.imgur.com/i6Iy7iN.mp4",
+"https://i.imgur.com/i9vKvTd.mp4"
  ];
- var callback = () => api.sendMessage({body:`🌻মানুষ হারাম ছাড়েনা অথচ সুখ শান্তি খুঁজে বেড়ায় আরাম \nমানুষ কেন বুঝতে চায় না\n সে যে খোদার গোলাম🥺। \n\nআল্লাহ আমাদের সবাইকে হারাম থেকে দূরে থাকার তৌফিক দান করুক 😭❤️‍🩹`,attachment: fs.createReadStream(__dirname + "/cache/1.mp4")}, event.threadID, () => fs.unlinkSync(__dirname + "/cache/1.mp4"));
- return request(encodeURI(link[Math.floor(Math.random() * link.length)])).pipe(fs.createWriteStream(__dirname+"/cache/1.mp4")).on("close",() => callback());
- };
+
+ const path = __dirname + "/cache/islamic.mp4";
+
+ // 🔥 STEP 1: typing effect
+ api.sendTypingIndicator(event.threadID, true);
+
+ setTimeout(() => {
+
+   // 🔥 STEP 2: loading animation
+   api.sendMessage("⏳ Preparing Islamic video...", event.threadID, (err, info) => {
+
+     let dots = 1;
+
+     const loading = setInterval(() => {
+       dots = (dots % 3) + 1;
+       api.editMessage("⏳ Loading" + ".".repeat(dots), info.messageID);
+     }, 500);
+
+     const video = videos[Math.floor(Math.random() * videos.length)];
+
+     // 🔥 STEP 3: download video
+     request(video)
+       .pipe(fs.createWriteStream(path))
+       .on("close", () => {
+
+         clearInterval(loading);
+
+         // 🔥 STEP 4: final message + video
+         api.editMessage("📥 Uploading video...", info.messageID);
+
+         api.sendMessage({
+           body: `🌙 𝗜𝘀𝗹𝗮𝗺𝗶𝗰 𝗥𝗲𝗺𝗶𝗻𝗱𝗲𝗿
+
+🌻 মানুষ হারাম ছাড়ে না অথচ সুখ খোঁজে 😔
+আল্লাহ আমাদের সবাইকে হারাম থেকে দূরে থাকার তৌফিক দান করুন 🤲❤️`,
+           attachment: fs.createReadStream(path)
+         }, event.threadID, () => {
+           try { fs.unlinkSync(path); } catch(e) {}
+         });
+
+       })
+
+       .on("error", () => {
+         clearInterval(loading);
+         api.editMessage("❌ Video load failed!", info.messageID);
+       });
+
+   });
+
+ }, 1000);
+};
